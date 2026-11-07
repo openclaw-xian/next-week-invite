@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>下个礼拜你有空吗 · 独家私约</title>
+<style>
+  :root{
+    --bg:#17110F;
+    --ink:#F3E9DA;
+    --red:#E8432B;
+    --gold:#F2B33C;
+    --dim:#9C8B7B;
+    --card:#211816;
+    --line:rgba(243,233,218,.14);
+    --serif:"Songti SC","SimSun","Noto Serif SC",Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:60;
+    opacity:.5;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+  }
+
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+  .label{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+
+  .rule{height:1px;background:var(--line);margin:0}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:22px 0 18px;
+    border-bottom:1px solid var(--line);
+    gap:16px;
+  }
+  .topbar .label{color:var(--ink)}
+  .topbar .label b{color:var(--red);font-weight:400}
+
+  /* ---------- hero ---------- */
+  .hero{padding:64px 0 40px;position:relative}
+  .hero__eyebrow{display:block;margin-bottom:26px}
+
+  .hero__grid{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:32px;
+    align-items:center;
+  }
+
+  h1{
+    font-family:var(--serif);
+    font-size:clamp(52px,9.2vw,116px);
+    line-height:.98;
+    letter-spacing:-.015em;
+    font-weight:900;
+  }
+  h1 .q{color:var(--red);margin-left:.05em}
+
+  .hero__lead{
+    margin-top:26px;
+    max-width:none;
+    color:var(--dim);
+    font-size:15px;
+    line-height:1.9;
+  }
+  .hero__lead em{color:var(--gold);font-style:normal}
+
+  .hero__meta{
+    display:flex;flex-wrap:wrap;gap:10px 22px;
+    margin-top:30px;
+  }
+  .tag{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:7px 14px;
+    color:var(--ink);
+  }
+  .tag--red{border-color:rgba(232,67,43,.5);color:var(--red)}
+
+  /* ---------- vinyl ---------- */
+  .disc{position:relative;display:flex;justify-content:center;align-items:center;min-height:260px}
+
+  .vinyl{
+    width:clamp(170px,25vw,240px);
+    aspect-ratio:1/1;
+    border-radius:50%;
+    position:relative;
+    animation:spin 13s linear infinite;
+    box-shadow:0 22px 50px rgba(0,0,0,.55), inset 0 0 0 2px rgba(243,233,218,.06);
+    background:
+      repeating-radial-gradient(circle at 50% 50%,
+        #2a211d 0 2px, #1d1614 2px 5px, #251d19 5px 7px),
+      radial-gradient(circle at 50% 50%, #302520, #14100e 70%);
+  }
+  .vinyl::after{
+    content:"";
+    position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 210deg,
+      rgba(255,255,255,.16), rgba(255,255,255,0) 22%,
+      rgba(255,255,255,.1) 42%, rgba(255,255,255,0) 62%,
+      rgba(255,255,255,.13) 80%, rgba(255,255,255,0));
+    mix-blend-mode:screen;
+  }
+  .vinyl__label{
+    position:absolute;inset:32%;
+    border-radius:50%;
+    background:var(--red);
+    display:flex;flex-direction:row;align-items:baseline;justify-content:center;
+    gap:6px;
+    padding-bottom:27px;
+    color:#2a0d08;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    animation:spin-rev 13s linear infinite;
+  }
+  .vinyl__label span{font-size:9px;letter-spacing:.2em;opacity:.75}
+  .vinyl__label b{font-size:14px;letter-spacing:.08em;line-height:1;margin:0}
+  .vinyl__hole{
+    position:absolute;top:50%;left:50%;width:8px;height:8px;
+    margin:-4px 0 0 -4px;border-radius:50%;
+    background:var(--bg);z-index:2;
+  }
+
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes spin-rev{to{transform:rotate(-360deg)}}
+
+  .needle{
+    position:absolute;top:6%;right:2%;
+    width:2px;height:52%;
+    background:linear-gradient(var(--ink),rgba(243,233,218,.25));
+    transform-origin:top center;
+    transform:rotate(28deg);
+    border-radius:2px;
+  }
+  .needle::before{
+    content:"";position:absolute;top:-6px;left:-5px;width:12px;height:12px;
+    border-radius:50%;background:var(--gold);
+  }
+
+  .disc__note{
+    position:absolute;bottom:-2px;left:0;right:0;
+    text-align:center;font-size:12px;color:var(--dim);
+  }
+
+  /* ---------- marquee ---------- */
+  .strip{
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+    margin:44px 0;
+  }
+  .strip__track{
+    display:flex;white-space:nowrap;will-change:transform;
+    animation:slide 26s linear infinite;
+  }
+  .strip__track--rev{animation-direction:reverse;animation-duration:31s}
+  .strip__item{
+    font-family:var(--serif);
+    font-size:clamp(20px,2.6vw,30px);
+    font-weight:700;
+    padding:14px 0;
+    letter-spacing:.02em;
+  }
+  .strip__item span{color:var(--red);padding:0 20px;font-family:"Helvetica Neue",Arial,sans-serif;font-weight:400}
+  .strip--dark .strip__item{font-size:clamp(15px,2vw,20px);letter-spacing:.18em;font-family:"Helvetica Neue",Arial,sans-serif;font-weight:400;color:var(--dim);padding:10px 0;text-transform:uppercase}
+
+  @keyframes slide{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+
+  /* ---------- sections ---------- */
+  section{padding:52px 0}
+  .sec__head{display:flex;align-items:baseline;gap:18px;margin-bottom:34px}
+  .sec__head .label{flex-shrink:0}
+  .sec__head .rule{flex:1;height:1px;background:var(--line);transform:translateY(-4px)}
+
+  h2{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(26px,3.6vw,40px);
+    line-height:1.25;
+    letter-spacing:-.01em;
+    margin-bottom:14px;
+  }
+  h2 .hl{color:var(--gold)}
+  .sec__intro{color:var(--dim);font-size:15px;margin-bottom:32px}
+
+  /* ---------- schedule ---------- */
+  .sched{border-top:1px solid var(--line)}
+  .row{
+    display:grid;
+    grid-template-columns:96px 1fr;
+    gap:20px;
+    padding:22px 0;
+    border-bottom:1px solid var(--line);
+    align-items:start;
+    transition:background .3s;
+  }
+  .row:hover{background:rgba(243,233,218,.025)}
+  .row__time{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:13px;letter-spacing:.1em;color:var(--red);
+    padding-top:3px;
+  }
+  .row__title{
+    font-family:var(--serif);
+    font-size:19px;font-weight:700;margin-bottom:4px;
+  }
+  .row__desc{color:var(--dim);font-size:14px}
+
+  .addr{
+    margin-top:34px;
+    border:1px solid var(--line);
+    background:var(--card);
+    padding:22px 24px;
+    display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:center;
+  }
+  .addr__k{font-size:12px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;font-family:"Helvetica Neue",Arial,sans-serif}
+  .addr__v{font-family:var(--serif);font-size:18px;margin-top:4px}
+  .addr__hint{font-size:12px;color:var(--dim);border-left:2px solid var(--gold);padding-left:10px;flex:0 0 auto;max-width:32ch}
+
+  /* ---------- karaoke ---------- */
+  .kara{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--card),#1b1412);
+    padding:38px 34px 34px;
+    position:relative;
+    overflow:hidden;
+  }
+  .kara::before{
+    content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;
+    border-radius:50%;background:radial-gradient(circle,rgba(232,67,43,.22),transparent 70%);
+  }
+  .kara__title{font-family:var(--serif);font-size:24px;font-weight:700;margin-bottom:8px}
+  .kara__rules{color:var(--dim);font-size:14px;margin-bottom:26px}
+
+  .keypad{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+  .key{
+    appearance:none;border:1px solid var(--line);background:transparent;
+    color:var(--ink);border-radius:6px;
+    padding:11px 18px;
+    font-family:var(--sans);font-size:14px;cursor:pointer;
+    transition:transform .12s, background .2s, border-color .2s;
+  }
+  .key:hover{background:rgba(243,233,218,.07);border-color:rgba(243,233,218,.34)}
+  .key:active{transform:scale(.96)}
+  .key--go{
+    background:var(--red);border-color:var(--red);color:#2a0d08;
+    font-weight:700;letter-spacing:.04em;
+  }
+  .key--go:hover{background:#f45a40;border-color:#f45a40}
+
+  .screen{
+    border:1px dashed rgba(243,233,218,.22);
+    border-radius:8px;
+    min-height:96px;
+    padding:20px 22px;
+    display:flex;flex-direction:column;justify-content:center;gap:6px;
+    background:rgba(0,0,0,.25);
+  }
+  .screen__line{font-family:var(--serif);font-size:clamp(17px,2.4vw,23px);font-weight:700}
+  .screen__sub{font-size:13px;color:var(--dim)}
+  .screen__line.pop{animation:pop .4s ease-out}
+  @keyframes pop{0%{opacity:0;transform:translateY(8px) scale(.98)}100%{opacity:1;transform:none}}
+
+  /* ---------- rules ---------- */
+  .rules{display:grid;gap:2px;border-top:1px solid var(--line)}
+  .ruleitem{
+    display:flex;gap:16px;align-items:flex-start;
+    padding:20px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    transition:background .25s;
+  }
+  .ruleitem:hover{background:rgba(243,233,218,.03)}
+  .box{
+    flex:0 0 22px;width:22px;height:22px;margin-top:3px;
+    border:1px solid rgba(243,233,218,.3);
+    border-radius:4px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .2s;
+  }
+  .box svg{width:12px;height:12px;opacity:0;transform:scale(.6);transition:all .2s}
+  .ruleitem.on .box{background:var(--gold);border-color:var(--gold)}
+  .ruleitem.on .box svg{opacity:1;transform:none;fill:#2a0d08}
+  .ruleitem.on .ruleitem__t{color:var(--dim);text-decoration:line-through;text-decoration-color:rgba(232,67,43,.6)}
+  .ruleitem__t{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.5;transition:color .2s}
+  .ruleitem__n{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:11px;color:var(--red);
+    letter-spacing:.2em;min-width:28px;padding-top:6px;
+  }
+  .rules__count{margin-top:16px;font-size:13px;color:var(--dim)}
+
+  /* ---------- rsvp ---------- */
+  .rsvp{
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:66px 0 70px;
+    text-align:center;
+    position:relative;
+  }
+  .rsvp h2{font-size:clamp(34px,6.4vw,68px);line-height:1.06;margin-bottom:12px}
+  .rsvp__sub{color:var(--dim);font-size:14px;margin-bottom:36px}
+
+  .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    appearance:none;cursor:pointer;
+    font-family:var(--sans);font-size:16px;font-weight:600;
+    padding:16px 34px;border-radius:999px;
+    border:1px solid transparent;
+    transition:transform .14s, background .2s, box-shadow .2s;
+  }
+  .btn--yes{background:var(--red);color:#2a0d08;box-shadow:0 10px 30px rgba(232,67,43,.28)}
+  .btn--yes:hover{background:#f45a40;transform:translateY(-2px)}
+  .btn--no{background:transparent;color:var(--ivory,var(--ink));border-color:rgba(243,233,218,.34)}
+  .btn--no:hover{background:rgba(243,233,218,.07)}
+  .btn:active{transform:scale(.97)}
+  .btn.shake{animation:shake .4s}
+
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-7px)}
+    40%{transform:translateX(7px)}
+    60%{transform:translateX(-5px)}
+    80%{transform:translateX(5px)}
+  }
+
+  .reply{
+    max-width:520px;margin:34px auto 0;
+    border:1px solid rgba(242,179,60,.35);
+    background:rgba(242,179,60,.06);
+    border-radius:12px;
+    padding:24px 24px 20px;
+    text-align:left;
+    display:none;
+  }
+  .reply.show{display:block;animation:pop .45s ease-out}
+  .reply__k{font-size:11px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;font-family:"Helvetica Neue",Arial,sans-serif;margin-bottom:10px}
+  .reply__text{
+    font-family:var(--serif);font-size:17px;line-height:1.8;
+    border-left:2px solid var(--gold);padding-left:14px;margin-bottom:18px;
+  }
+  .reply__row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .copy{
+    appearance:none;cursor:pointer;
+    background:rgba(243,233,218,.06);border:1px solid rgba(243,233,218,.55);
+    color:var(--ink);border-radius:999px;padding:9px 18px;font-size:13px;
+    font-family:var(--sans);transition:all .2s;
+  }
+  .copy:hover{background:rgba(243,233,218,.08)}
+  .copy__ok{font-size:12px;color:var(--gold)}
+
+  .no-msg{color:var(--dim);font-size:14px;margin-top:22px;min-height:24px}
+
+  /* ---------- footer ---------- */
+  footer{padding:46px 0 56px}
+  .foot{
+    display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px 30px;
+    align-items:flex-end;
+  }
+  .foot__l{max-width:52ch}
+  .foot__l p{color:var(--dim);font-size:13px;line-height:1.9}
+  .foot__mark{
+    font-family:var(--serif);font-size:15px;color:var(--ink);
+  }
+  .foot__mark b{color:var(--red)}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:760px){
+    .hero{padding:40px 0 28px}
+    .hero__grid{grid-template-columns:1fr;gap:16px}
+    .hero__meta{gap:8px 10px;margin-top:22px}
+    .tag{padding:6px 12px;font-size:10px;letter-spacing:.14em}
+    .disc{order:-1;min-height:0;flex-direction:column;gap:8px;justify-content:center}
+    .vinyl{width:158px}
+    .needle{right:auto;left:calc(50% + 54px);top:0;height:44%}
+    .disc__note{position:static;margin:0;text-align:center}
+    .row{grid-template-columns:1fr;gap:6px}
+    .row__time{padding-top:0}
+    .ruleitem{gap:12px;padding:18px 2px}
+    .ruleitem__n{min-width:22px;font-size:10px}
+    .ruleitem__t{font-size:16px}
+    .kara{padding:28px 22px}
+    .sec__head{gap:12px}
+    h1{font-size:clamp(46px,13.5vw,84px)}
+    section{padding:40px 0}
+    .strip{margin:30px 0}
+    .foot{flex-direction:column;align-items:flex-start}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .vinyl,.vinyl__label,.strip__track{animation:none}
+    .reveal{opacity:1;transform:none;transition:none}
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="label">私人邀请函 <b>·</b> 仅此一份</div>
+    <div class="label">NO. 06</div>
+  </header>
+
+  <div class="hero">
+    <span class="label hero__eyebrow reveal">标题借自《爱情公寓》第三季 · 第 06 集</span>
+    <div class="hero__grid">
+      <div>
+        <h1 class="reveal">下个礼拜<br>你有空<span class="q">吗</span></h1>
+        <p class="hero__lead reveal">别说你太忙，别说你没空 ——<br><em>有我们一起陪你放轻松。</em></p>
+        <div class="hero__meta reveal">
+          <span class="tag tag--red">下周六</span>
+          <span class="tag">15:30 起</span>
+          <span class="tag">来我家</span>
+          <span class="tag">至深夜</span>
+        </div>
+      </div>
+      <div class="disc reveal">
+        <div class="vinyl">
+          <div class="vinyl__label"><span>SIDE</span><b>A</b></div>
+          <div class="vinyl__hole"></div>
+        </div>
+        <div class="needle"></div>
+        <div class="disc__note">这张碟里只有一首歌</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip" aria-hidden="true">
+    <div class="strip__track">
+      <span class="strip__item">下个礼拜你有空吗<span>×</span>我们还在这里等着你<span>×</span>别说你太忙 别说你没空<span>×</span></span>
+      <span class="strip__item">下个礼拜你有空吗<span>×</span>我们还在这里等着你<span>×</span>别说你太忙 别说你没空<span>×</span></span>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec__head reveal">
+      <span class="label">Program / 当天怎么过</span>
+      <span class="rule"></span>
+    </div>
+    <h2 class="reveal">时间我都排好了，<span class="hl">剩下的看你聊到几点</span></h2>
+    <p class="sec__intro reveal">原版是"情侣周末"，人多了才好玩，所以我改成了谁都能来的版本。</p>
+
+    <div class="sched reveal">
+      <div class="row">
+        <div class="row__time">15:30</div>
+        <div>
+          <div class="row__title">到场 · 一起做饭</div>
+          <div class="row__desc">菜我买好了，你负责剁。剁得慢也算全程参与。</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row__time">17:00</div>
+        <div>
+          <div class="row__title">开饭</div>
+          <div class="row__desc">桌子摆开，酒水自便，锅里有什么就吃什么。</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row__time">19:30</div>
+        <div>
+          <div class="row__title">家庭 KTV 开机</div>
+          <div class="row__desc">第一首必须合唱，跑调也算完成仪式。</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row__time">22:00</div>
+        <div>
+          <div class="row__title">深夜档</div>
+          <div class="row__desc">投影、桌游、纯聊天，三选一，也可以都不选。</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row__time">深夜</div>
+        <div>
+          <div class="row__title">谁先睡着，谁就是今晚的 MVP</div>
+          <div class="row__desc">散场时间不作承诺，沙发够长。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 把下面这一行地址换成你自己家的 -->
+    <div class="addr reveal">
+      <div>
+        <div class="addr__k">Where · 在哪儿</div>
+        <div class="addr__v">我家 · XX 小区 X 号楼 XXXX</div>
+      </div>
+      <div class="addr__hint">到楼下按我门牌，门禁 0000。</div>
+    </div>
+  </section>
+
+  <div class="strip strip--dark" aria-hidden="true">
+    <div class="strip__track strip__track--rev">
+      <span class="strip__item">COUPLE'S WEEKEND<span>·</span>一起做饭<span>·</span>家庭 KTV<span>·</span>聊到半夜<span>·</span>三天也聊不完<span>·</span></span>
+      <span class="strip__item">COUPLE'S WEEKEND<span>·</span>一起做饭<span>·</span>家庭 KTV<span>·</span>聊到半夜<span>·</span>三天也聊不完<span>·</span></span>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec__head reveal">
+      <span class="label">Karaoke / 点歌台</span>
+      <span class="rule"></span>
+    </div>
+    <h2 class="reveal">本机只存了一首歌，<span class="hl">但你可以点很多次</span></h2>
+    <p class="sec__intro reveal">点什么都行，机器只会放这一首。想听别的，你自己带。</p>
+
+    <div class="kara reveal">
+      <div class="kara__title">点歌台 · 营业到散场</div>
+      <div class="kara__rules">歌词本只有一页，其余现点现唱。</div>
+      <div class="keypad">
+        <button class="key" type="button" data-key>点歌</button>
+        <button class="key" type="button" data-key>换一首</button>
+        <button class="key key--go" type="button" data-key>随机点一首</button>
+      </div>
+      <div class="screen" id="screen">
+        <div class="screen__line" id="scrLine">《下个礼拜你有空吗》</div>
+        <div class="screen__sub" id="scrSub">已就绪 · 按下按钮开机</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec__head reveal">
+      <span class="label">Side B / 周末守则</span>
+      <span class="rule"></span>
+    </div>
+    <h2 class="reveal">进门就是自己人，<span class="hl">但守则还是要守</span></h2>
+    <p class="sec__intro reveal">点一下就算签过字了，别不认。</p>
+
+    <div class="rules reveal" id="rules">
+      <div class="ruleitem">
+        <div class="box"><svg viewBox="0 0 12 12"><path d="M1 6.4 4.4 9.8 11 2.4" stroke="none"/></svg></div>
+        <div class="ruleitem__n">01</div>
+        <div class="ruleitem__t">进门先跳迎宾舞，跳不好也要跳</div>
+      </div>
+      <div class="ruleitem">
+        <div class="box"><svg viewBox="0 0 12 12"><path d="M1 6.4 4.4 9.8 11 2.4" stroke="none"/></svg></div>
+        <div class="ruleitem__n">02</div>
+        <div class="ruleitem__t">手机扣在桌上，谁先拿起来谁洗碗</div>
+      </div>
+      <div class="ruleitem">
+        <div class="box"><svg viewBox="0 0 12 12"><path d="M1 6.4 4.4 9.8 11 2.4" stroke="none"/></svg></div>
+        <div class="ruleitem__n">03</div>
+        <div class="ruleitem__t">全程不许说"我下周还有事"</div>
+      </div>
+      <div class="ruleitem">
+        <div class="box"><svg viewBox="0 0 12 12"><path d="M1 6.4 4.4 9.8 11 2.4" stroke="none"/></svg></div>
+        <div class="ruleitem__n">04</div>
+        <div class="ruleitem__t">饭可以吃得慢，歌必须唱得响</div>
+      </div>
+      <div class="ruleitem">
+        <div class="box"><svg viewBox="0 0 12 12"><path d="M1 6.4 4.4 9.8 11 2.4" stroke="none"/></svg></div>
+        <div class="ruleitem__n">05</div>
+        <div class="ruleitem__t">走之前必须答应：下个礼拜还有空</div>
+      </div>
+    </div>
+    <div class="rules__count" id="rulesCount">已签 0 / 5 条</div>
+  </section>
+
+  <div class="rsvp">
+    <h2 class="reveal">所以，<br>下个礼拜你有空吗</h2>
+    <div class="rsvp__sub reveal">回个话就行，不用写作文。</div>
+
+    <div class="btns reveal">
+      <button class="btn btn--yes" type="button" id="btnYes">我有空</button>
+      <button class="btn btn--no" type="button" id="btnNo">我太忙</button>
+    </div>
+
+    <div class="reply" id="reply">
+      <div class="reply__k">把这句发我就行</div>
+      <div class="reply__text" id="replyText">我有空。<br>下个礼拜六 15:30 到，我负责吃和唱，你负责别的。</div>
+      <div class="reply__row">
+        <button class="copy" type="button" id="btnCopy">复制这句</button>
+        <span class="copy__ok" id="copyOk"></span>
+      </div>
+    </div>
+
+    <div class="no-msg" id="noMsg"></div>
+  </div>
+
+  <footer>
+    <div class="foot">
+      <div class="foot__l">
+        <p>本页只用于私人约饭。标题与歌词借自《爱情公寓》第三季第 06 集，非商用。<br>唱跑调、跳错舞、聊到半夜，都不算事故。</p>
+      </div>
+      <div class="foot__mark">下次去你家，我<b>跳迎宾舞</b>。</div>
+    </div>
+  </footer>
+
+</div>
+<script>
+(function(){
+  var $ = function(s,r){ return (r||document).querySelector(s); };
+  var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+  /* ---------- 滚动出现 ---------- */
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold:0, rootMargin:'140px 0px 140px 0px' });
+    $$('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    $$('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ---------- 小音效 ---------- */
+  var ac = null;
+  function actx(){
+    if (!ac){
+      try{ ac = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ ac = null; }
+    }
+    return ac;
+  }
+  function beep(freq, delay, dur, type, vol){
+    var c = actx(); if (!c) return;
+    var t0 = c.currentTime + (delay||0);
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'square';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(vol === undefined ? .1 : vol, t0 + .012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + (dur||.1));
+    o.connect(g); g.connect(c.destination);
+    o.start(t0); o.stop(t0 + (dur||.1) + .03);
+  }
+  function discoRiff(){
+    var seq = [[523,0],[587,.085],[659,.17],[784,.255],[659,.34],[587,.425],[523,.51],[523,.68]];
+    seq.forEach(function(p){ beep(p[0], p[1], .1, 'square', .13); });
+    beep(392, .6, .16, 'triangle', .1);
+  }
+
+  /* ---------- 点歌台：永远只有一首 ---------- */
+  var scrLine = $('#scrLine'), scrSub = $('#scrSub'), screen = $('#screen');
+  var pickCount = 0;
+  var subs = [
+    '已开机 · 前奏响起，请准备嗓子',
+    '又点了一次 · 它还是只有这一首',
+    '机器说：换不了，你自己跳吧',
+    '你在跟一台只有一页歌词本的机器较劲'
+  ];
+  $$('[data-key]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      pickCount++;
+      var sub;
+      if (pickCount <= subs.length) sub = subs[pickCount - 1];
+      else sub = '第 ' + pickCount + ' 次 · 它依然没有别的歌';
+      scrLine.textContent = pickCount > 3
+        ? '《下个礼拜你有空吗》（第 ' + pickCount + ' 遍）'
+        : '《下个礼拜你有空吗》';
+      scrSub.textContent = sub;
+      scrLine.classList.remove('pop'); void scrLine.offsetWidth; scrLine.classList.add('pop');
+      beep(pickCount % 2 ? 880 : 988, 0, .07, 'square', .09);
+    });
+  });
+
+  /* ---------- 守则打勾 ---------- */
+  var rules = $('#rules'), rulesCount = $('#rulesCount');
+  $$('.ruleitem').forEach(function(item){
+    item.addEventListener('click', function(){
+      item.classList.toggle('on');
+      var on = $$('.ruleitem.on', rules).length;
+      rulesCount.textContent = on === 5 ? '已签 5 / 5 条 · 契约成立，不见不散' : '已签 ' + on + ' / 5 条';
+      if (item.classList.contains('on')) beep(1046, 0, .05, 'triangle', .1);
+    });
+  });
+
+  /* ---------- RSVP ---------- */
+  var noBtn = $('#btnNo'), noMsg = $('#noMsg'), reply = $('#reply'), copyOk = $('#copyOk');
+  var noLines = [
+    '别说你太忙，别说你没空。',
+    '……行吧，那下个礼拜呢？',
+    '这台点歌机都还在等你，你再考虑一下。',
+    '好吧，我记下了。下次一定。',
+    '（沉默）……那就下次。'
+  ];
+  var noCount = 0;
+  noBtn.addEventListener('click', function(){
+    noBtn.classList.remove('shake'); void noBtn.offsetWidth; noBtn.classList.add('shake');
+    noMsg.textContent = noLines[Math.min(noCount, noLines.length - 1)];
+    noCount++;
+    beep(233, 0, .12, 'triangle', .09);
+  });
+
+  $('#btnYes').addEventListener('click', function(){
+    reply.classList.add('show');
+    noMsg.textContent = '';
+    confettiBurst();
+    discoRiff();
+    setTimeout(function(){ reply.scrollIntoView({ behavior:'smooth', block:'center' }); }, 140);
+  });
+
+  function copyDone(){
+    copyOk.textContent = '已复制';
+    setTimeout(function(){ copyOk.textContent = ''; }, 2200);
+  }
+  $('#btnCopy').addEventListener('click', function(){
+    var text = ($('#replyText').innerText || $('#replyText').textContent).trim();
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(copyDone, fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+    function fallbackCopy(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); copyDone(); }
+      catch(e){ copyOk.textContent = '手动选一下上面那句'; }
+      ta.remove();
+    }
+  });
+
+  /* ---------- 彩纸屑 ---------- */
+  var cv = $('#confetti'), c2d = cv.getContext('2d');
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var parts = [], raf = null;
+  function sizeCanvas(){
+    cv.width = Math.floor(innerWidth * dpr);
+    cv.height = Math.floor(innerHeight * dpr);
+    cv.style.width = innerWidth + 'px';
+    cv.style.height = innerHeight + 'px';
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  var palette = ['#E8432B','#F2B33C','#F3E9DA','#B0341C','#D9A22E'];
+  function confettiBurst(){
+    for (var i = 0; i < 90; i++){
+      parts.push({
+        x: innerWidth * 0.5 + (Math.random() - .5) * 180,
+        y: innerHeight * 0.42 + (Math.random() - .5) * 50,
+        vx: (Math.random() - .5) * 13,
+        vy: -Math.random() * 12 - 4,
+        w: 5 + Math.random() * 7,
+        h: 3 + Math.random() * 4,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - .5) * .5,
+        c: palette[Math.floor(Math.random() * palette.length)],
+        life: 1
+      });
+    }
+    if (raf === null) raf = requestAnimationFrame(tick);
+  }
+  function tick(){
+    c2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c2d.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(function(p){
+      p.vy += .32;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= .012;
+      c2d.save();
+      c2d.globalAlpha = p.life > 0 ? p.life : 0;
+      c2d.translate(p.x, p.y);
+      c2d.rotate(p.rot);
+      c2d.fillStyle = p.c;
+      c2d.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      c2d.restore();
+    });
+    parts = parts.filter(function(p){ return p.life > 0 && p.y < innerHeight + 60; });
+    if (parts.length){
+      raf = requestAnimationFrame(tick);
+    } else {
+      raf = null;
+      c2d.clearRect(0, 0, innerWidth, innerHeight);
+    }
+  }
+})();
+</script>
+</body>
+</html>
