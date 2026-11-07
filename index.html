@@ -110,18 +110,23 @@
   /* ---------- vinyl ---------- */
   .disc{position:relative;display:flex;justify-content:center;align-items:center;min-height:260px}
 
+  .platter{position:relative;width:clamp(170px,25vw,240px)}
+
   .vinyl{
-    width:clamp(170px,25vw,240px);
+    width:100%;
     aspect-ratio:1/1;
     border-radius:50%;
     position:relative;
-    animation:spin 13s linear infinite;
+    cursor:pointer;
+    transition:box-shadow .3s, transform .3s;
     box-shadow:0 22px 50px rgba(0,0,0,.55), inset 0 0 0 2px rgba(243,233,218,.06);
     background:
       repeating-radial-gradient(circle at 50% 50%,
         #2a211d 0 2px, #1d1614 2px 5px, #251d19 5px 7px),
       radial-gradient(circle at 50% 50%, #302520, #14100e 70%);
   }
+  .vinyl:hover{box-shadow:0 22px 60px rgba(232,67,43,.2), 0 22px 50px rgba(0,0,0,.55), inset 0 0 0 2px rgba(243,233,218,.12)}
+  .vinyl.playing{animation:spin 13s linear infinite}
   .vinyl::after{
     content:"";
     position:absolute;inset:0;border-radius:50%;
@@ -135,15 +140,18 @@
     position:absolute;inset:32%;
     border-radius:50%;
     background:var(--red);
-    display:flex;flex-direction:row;align-items:baseline;justify-content:center;
-    gap:6px;
-    padding-bottom:27px;
+  }
+  .vinyl__tag{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-75%);
+    display:flex;align-items:baseline;gap:6px;
     color:#2a0d08;
     font-family:"Helvetica Neue",Arial,sans-serif;
-    animation:spin-rev 13s linear infinite;
+    pointer-events:none;
+    z-index:3;
   }
-  .vinyl__label span{font-size:9px;letter-spacing:.2em;opacity:.75}
-  .vinyl__label b{font-size:14px;letter-spacing:.08em;line-height:1;margin:0}
+  .vinyl__tag span{font-size:9px;letter-spacing:.2em;opacity:.75}
+  .vinyl__tag b{font-size:14px;letter-spacing:.08em;line-height:1;margin:0}
   .vinyl__hole{
     position:absolute;top:50%;left:50%;width:8px;height:8px;
     margin:-4px 0 0 -4px;border-radius:50%;
@@ -151,7 +159,6 @@
   }
 
   @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes spin-rev{to{transform:rotate(-360deg)}}
 
   .needle{
     position:absolute;top:6%;right:2%;
@@ -170,6 +177,46 @@
     position:absolute;bottom:-2px;left:0;right:0;
     text-align:center;font-size:12px;color:var(--dim);
   }
+
+  /* ---------- player ---------- */
+  .lyricbar{
+    display:flex;align-items:center;gap:20px;
+    padding:20px 0;
+    margin:34px 0 6px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .lyricbar__k{
+    flex-shrink:0;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--gold);
+  }
+  .lyricbar__text{
+    flex:1;min-width:0;
+    font-family:var(--serif);
+    font-size:clamp(17px,2.2vw,22px);
+    font-weight:700;
+    line-height:1.4;
+    transition:opacity .22s, transform .22s;
+  }
+  .lyricbar__text.dim{opacity:0;transform:translateY(6px)}
+
+  .playbtn{
+    flex:0 0 auto;
+    width:52px;height:52px;border-radius:50%;
+    border:1px solid rgba(243,233,218,.35);
+    background:transparent;color:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .2s;
+  }
+  .playbtn:hover{background:rgba(243,233,218,.09);border-color:rgba(243,233,218,.6)}
+  .playbtn:active{transform:scale(.94)}
+  .playbtn svg{width:16px;height:16px;fill:currentColor}
+  .playbtn .ico-pause{display:none}
+  .playbtn.on{background:var(--red);border-color:var(--red);color:#2a0d08}
+  .playbtn.on .ico-play{display:none}
+  .playbtn.on .ico-pause{display:block}
 
   /* ---------- marquee ---------- */
   .strip{
@@ -401,11 +448,14 @@
   /* ---------- responsive ---------- */
   @media (max-width:760px){
     .hero{padding:40px 0 28px}
+    .lyricbar{gap:12px;padding:16px 0;margin:24px 0 4px}
+    .lyricbar__k{display:none}
+    .playbtn{width:46px;height:46px}
     .hero__grid{grid-template-columns:1fr;gap:16px}
     .hero__meta{gap:8px 10px;margin-top:22px}
     .tag{padding:6px 12px;font-size:10px;letter-spacing:.14em}
     .disc{order:-1;min-height:0;flex-direction:column;gap:8px;justify-content:center}
-    .vinyl{width:158px}
+    .platter{width:158px}
     .needle{right:auto;left:calc(50% + 54px);top:0;height:44%}
     .disc__note{position:static;margin:0;text-align:center}
     .row{grid-template-columns:1fr;gap:6px}
@@ -422,7 +472,7 @@
   }
 
   @media (prefers-reduced-motion:reduce){
-    .vinyl,.vinyl__label,.strip__track{animation:none}
+    .vinyl,.vinyl.playing,.strip__track{animation:none}
     .reveal{opacity:1;transform:none;transition:none}
   }
 </style>
@@ -451,14 +501,26 @@
         </div>
       </div>
       <div class="disc reveal">
-        <div class="vinyl">
-          <div class="vinyl__label"><span>SIDE</span><b>A</b></div>
-          <div class="vinyl__hole"></div>
+        <div class="platter">
+          <div class="vinyl" id="vinyl" role="button" tabindex="0" aria-label="播放或暂停">
+            <div class="vinyl__label"></div>
+            <div class="vinyl__hole"></div>
+          </div>
+          <div class="vinyl__tag"><span>SIDE</span><b>A</b></div>
         </div>
         <div class="needle"></div>
-        <div class="disc__note">这张碟里只有一首歌</div>
+        <div class="disc__note" id="discNote">这张碟只有一首歌 · 点它才转</div>
       </div>
     </div>
+  </div>
+
+  <div class="lyricbar reveal">
+    <span class="lyricbar__k">Now Playing</span>
+    <div class="lyricbar__text" id="lyricText">点右边的键开机 —— 音乐是自制伴奏版，不是原曲</div>
+    <button class="playbtn" type="button" id="btnPlay" aria-label="播放或暂停">
+      <svg class="ico-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="ico-pause" viewBox="0 0 24 24"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+    </button>
   </div>
 
   <div class="strip" aria-hidden="true">
@@ -666,6 +728,142 @@
     beep(392, .6, .16, 'triangle', .1);
   }
 
+  /* ---------- 唱片机：合成伴奏 ---------- */
+  var music = (function(){
+    var BPM = 110, stepDur = (60 / BPM) / 2;
+    var semis = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+    var melody = ['G4','A4','B4','C5','D5','C5','B4','G4','E5','D5','C5','A4','G4','A4','B4','D5'];
+    var bass = ['C3','C3','F3','F3','G3','G3','C3','C3'];
+    var lyrics = [
+      '下个礼拜你有空吗',
+      '下个礼拜我们还在这里等着你',
+      '别说你太忙，别说你没空',
+      '有我们一起陪你放轻松'
+    ];
+    var c = null, master = null, noiseBuf = null;
+    var running = false, timer = null, step = 0, nextTime = 0, lyricIdx = -1;
+
+    function hz(name){
+      var m = /([A-G])(\d)/.exec(name);
+      var s = (parseInt(m[2], 10) - 4) * 12 + semis[m[1]] - 9;
+      return 440 * Math.pow(2, s / 12);
+    }
+    function boot(){
+      c = actx();
+      if (!c) return null;
+      if (!master){
+        master = c.createGain();
+        master.gain.value = 0.9;
+        master.connect(c.destination);
+      }
+      if (!noiseBuf){
+        noiseBuf = c.createBuffer(1, Math.ceil(c.sampleRate * 0.2), c.sampleRate);
+        var d = noiseBuf.getChannelData(0);
+        for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      return c;
+    }
+    function tone(freq, t, dur, type, vol){
+      var o = c.createOscillator(), g = c.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(master);
+      o.start(t); o.stop(t + dur + 0.03);
+    }
+    function drum(kind, t){
+      if (kind === 'kick'){
+        var o = c.createOscillator(), g = c.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(150, t);
+        o.frequency.exponentialRampToValueAtTime(48, t + 0.13);
+        g.gain.setValueAtTime(0.3, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+        o.connect(g); g.connect(master);
+        o.start(t); o.stop(t + 0.18);
+        return;
+      }
+      var src = c.createBufferSource(), g2 = c.createGain(), f = c.createBiquadFilter();
+      src.buffer = noiseBuf;
+      f.type = kind === 'hat' ? 'highpass' : 'bandpass';
+      f.frequency.value = kind === 'hat' ? 6500 : 950;
+      g2.gain.value = kind === 'hat' ? 0.05 : 0.15;
+      src.connect(f); f.connect(g2); g2.connect(master);
+      src.start(t); src.stop(t + 0.2);
+    }
+    function schedule(i, t){
+      var s = i % 16;
+      tone(hz(melody[s]), t, stepDur * 0.9, 'square', 0.05);
+      if (s % 2 === 0) tone(hz(bass[s / 2]), t, stepDur * 1.9, 'triangle', 0.07);
+      if (s % 2 === 0) drum('kick', t);
+      if (s % 8 === 4) drum('snare', t);
+      drum('hat', t);
+    }
+    function showLyric(idx){
+      if (idx === lyricIdx) return;
+      lyricIdx = idx;
+      var el = document.getElementById('lyricText');
+      if (!el) return;
+      el.classList.add('dim');
+      setTimeout(function(){
+        el.textContent = lyrics[idx % lyrics.length];
+        el.classList.remove('dim');
+      }, 200);
+    }
+    function queueLyric(idx, time){
+      var wait = Math.max(0, (time - c.currentTime) * 1000);
+      setTimeout(function(){ if (running) showLyric(idx); }, wait);
+    }
+    function tick(){
+      while (nextTime < c.currentTime + 0.15){
+        schedule(step, nextTime);
+        if (step % 32 === 0) queueLyric(step / 32, nextTime);
+        nextTime += stepDur;
+        step++;
+      }
+    }
+    function paint(on){
+      var v = document.getElementById('vinyl');
+      var btn = document.getElementById('btnPlay');
+      var note = document.getElementById('discNote');
+      if (v) v.classList.toggle('playing', on);
+      if (btn) btn.classList.toggle('on', on);
+      if (note) note.textContent = on ? '♪ 正在放 · 自制伴奏版' : '这张碟只有一首歌 · 点它才转';
+    }
+    function play(){
+      if (running) return;
+      if (!boot()) return;
+      if (c.state === 'suspended' && c.resume) c.resume();
+      running = true;
+      step = 0;
+      lyricIdx = -1;
+      nextTime = c.currentTime + 0.08;
+      showLyric(0);
+      timer = setInterval(tick, 25);
+      paint(true);
+    }
+    function stop(){
+      if (!running) return;
+      running = false;
+      clearInterval(timer);
+      timer = null;
+      paint(false);
+    }
+    return { play: play, stop: stop, toggle: function(){ running ? stop() : play(); }, isOn: function(){ return running; } };
+  })();
+
+  var vinylEl = document.getElementById('vinyl');
+  var btnPlay = document.getElementById('btnPlay');
+  if (btnPlay) btnPlay.addEventListener('click', function(){ music.toggle(); });
+  if (vinylEl){
+    vinylEl.addEventListener('click', function(){ music.toggle(); });
+    vinylEl.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); music.toggle(); }
+    });
+  }
+
   /* ---------- 点歌台：永远只有一首 ---------- */
   var scrLine = $('#scrLine'), scrSub = $('#scrSub'), screen = $('#screen');
   var pickCount = 0;
@@ -678,6 +876,7 @@
   $$('[data-key]').forEach(function(btn){
     btn.addEventListener('click', function(){
       pickCount++;
+      music.play();
       var sub;
       if (pickCount <= subs.length) sub = subs[pickCount - 1];
       else sub = '第 ' + pickCount + ' 次 · 它依然没有别的歌';
