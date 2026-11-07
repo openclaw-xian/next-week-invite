@@ -730,9 +730,10 @@
 
   /* ---------- 唱片机：合成伴奏 ---------- */
   var music = (function(){
-    var BPM = 110, stepDur = (60 / BPM) / 2;
+    var BPM = 136, stepDur = (60 / BPM) / 2;
     var semis = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
-    var melody = ['G4','A4','B4','C5','D5','C5','B4','G4','E5','D5','C5','A4','G4','A4','B4','D5'];
+    var melody = ['C5','E5','G5','C6','B5','G5','E5','G5','A5','G5','F5','A5','G5','E5','D5','C5'];
+    var bell = ['C6','E6','G6','E6','C6','G6','E6','G6','A5','C6','F6','A5','C6','E6','D6','C6'];
     var bass = ['C3','C3','F3','F3','G3','G3','C3','C3'];
     var lyrics = [
       '下个礼拜你有空吗',
@@ -753,7 +754,7 @@
       if (!c) return null;
       if (!master){
         master = c.createGain();
-        master.gain.value = 0.9;
+        master.gain.value = 1;
         master.connect(c.destination);
       }
       if (!noiseBuf){
@@ -787,18 +788,23 @@
       }
       var src = c.createBufferSource(), g2 = c.createGain(), f = c.createBiquadFilter();
       src.buffer = noiseBuf;
-      f.type = kind === 'hat' ? 'highpass' : 'bandpass';
-      f.frequency.value = kind === 'hat' ? 6500 : 950;
-      g2.gain.value = kind === 'hat' ? 0.05 : 0.15;
+      if (kind === 'hat'){
+        f.type = 'highpass'; f.frequency.value = 6800; g2.gain.value = 0.045;
+      } else if (kind === 'clap'){
+        f.type = 'bandpass'; f.frequency.value = 1400; g2.gain.value = 0.09;
+      } else {
+        f.type = 'bandpass'; f.frequency.value = 950; g2.gain.value = 0.13;
+      }
       src.connect(f); f.connect(g2); g2.connect(master);
       src.start(t); src.stop(t + 0.2);
     }
     function schedule(i, t){
       var s = i % 16;
-      tone(hz(melody[s]), t, stepDur * 0.9, 'square', 0.05);
-      if (s % 2 === 0) tone(hz(bass[s / 2]), t, stepDur * 1.9, 'triangle', 0.07);
+      tone(hz(melody[s]), t, stepDur * 0.75, 'square', 0.07);
+      tone(hz(bell[s]), t, stepDur * 0.5, 'triangle', 0.04);
+      if (s % 2 === 0) tone(hz(bass[s / 2]), t, stepDur * 1.6, 'triangle', 0.075);
       if (s % 2 === 0) drum('kick', t);
-      if (s % 8 === 4) drum('snare', t);
+      if (s % 8 === 4){ drum('snare', t); drum('clap', t); }
       drum('hat', t);
     }
     function showLyric(idx){
